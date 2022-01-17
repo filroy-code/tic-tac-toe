@@ -1,4 +1,5 @@
 let x = 1
+let moveCounter = 0
 let winningArrays = {
     1: ["0", "1", "2"],
     2: ["0", "3", "6"],
@@ -10,7 +11,8 @@ let winningArrays = {
     8: ["2", "4", "6"],
 }
 
-let winner
+let winner = null;
+let gameBoard = document.getElementById('gameBoard')
 
 const scoreboard = {
 xSelections: [],
@@ -89,7 +91,6 @@ function playerTurn() {
 
 function winCheck() {
     for (counter in scoreboard) {
-        // console.log(scoreboard[counter])
         for (key in winningArrays) {
             test = winningArrays[key]
             const containsAll = test.every(i => scoreboard[counter].includes(i));
@@ -104,18 +105,18 @@ function winCheck() {
                     break;
                 }
             }
-            // console.log(containsAll)
         }
-        //const containsAll = winningArrays.every(i => scoreboard[counter].includes(i));
-        // console.log(scoreboard[counter])
-        // console.log(containsAll)
+    }
+    if (moveCounter === 9 && winner === null) {
+        turnDisplay.innerHTML = "It's a tie!"
     }
 }
 
 function play() {
     tiles.forEach((tile) => {
-        tile.addEventListener('click', (e) => {
-            tile.innerHTML = selector
+        tile.addEventListener('click', function stickTile(e) {
+            if (winner === null) {tile.innerHTML = selector
+            moveCounter++
             switch(x) {
                 case 1: scoreboard.xSelections.push(e.target.id);
                 break;
@@ -130,7 +131,8 @@ function play() {
             }
             playerTurn()
             winCheck()
-        })
+            tile.removeEventListener('click', stickTile)
+        }})
     })}
 
 function winUpdate() {
@@ -144,17 +146,21 @@ function winUpdate() {
 function reset() {
     x = 1;
     winner = null;
+    moveCounter = 0;
     scoreboard.xSelections = [];
     scoreboard.oSelections = [];
+    play();
     playerTurn()
 }
 
 resetButton = document.getElementById('resetButton')
 
 resetButton.addEventListener('click', () => {
-    reset();
-    theTiles = document.querySelectorAll('.tile')
-    theTiles.forEach((theTile) => {
-        theTile.innerHTML = ""
-    }
-)})
+        gameBoard.remove();
+        gameBoard = document.createElement('div')
+        gameBoard.setAttribute('id', 'gameBoard')
+        document.body.prepend(gameBoard)
+        createBoard()
+        tiles = document.querySelectorAll(".tile")
+        reset()
+})
